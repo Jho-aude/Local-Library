@@ -37,16 +37,27 @@ function getBooksPossessedByAccount(account, books, authors) {
     };
     const { id, title, genre, authorId, author, borrows } = book;
 
-    borrowed.forEach((borrow) => {
-      if (borrow.id === account.id && borrow.returned === false) {
-        result.push(book);
-        borrowMatch.push(borrow);
-        book.borrows = borrowMatch;
-        book.author = authors.filter((auth) => auth.id === book.authorId)[0];
-      }
-    });
+    getBorrowedMatch(borrowed, account, result, book, borrowMatch, authors);
   });
   return result;
+}
+
+function getBorrowedMatch(
+  borrowed,
+  account,
+  result,
+  book,
+  borrowMatch,
+  authors
+) {
+  borrowed.forEach((borrow) => {
+    if (borrow.id === account.id && borrow.returned === false) {
+      result.push(book);
+      borrowMatch.push(borrow);
+      book.borrows = borrowMatch;
+      book.author = authors.filter((auth) => auth.id === book.authorId)[0];
+    }
+  });
 }
 
 module.exports = {
