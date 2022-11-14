@@ -44,22 +44,65 @@ function getMostPopularBooks(books) {
 }
 
 function getMostPopularAuthors(books, authors) {
-  let result = [];
-  authors.forEach((author) => {
-    let theAuthor = {
-      name: `${author.name.first} ${author.name.last}`,
-      count: 0,
-    };
-    books.forEach((book) => {
-      if (book.authorId === author.id) {
-        theAuthor.count += book.borrows.length;
-      }
-    });
-    result.push(theAuthor);
+  const authorList = [];
+  const countList = [];
+  const authorIdList = [];
+
+  authors.forEach(author => {
+    
+    if (!authorIdList.includes(author.id)) {
+    authorIdList.push(author.id);
+    
+    authorList.push(`${author.name.first} ${author.name.last}`);
+  
+    const authorBooks = books.filter(book => book.authorId === author.id);
+    const authorBooksBorrows = authorBooks.map(book => book.borrows.length);
+ 
+    countList.push(authorBooksBorrows.reduce((acc, count) => acc + count));
+    }
   });
-  return result.sort((a, b) => b.count - a.count).slice(0, 5);
+  
+  return makeSortedTopFiveNameCountArray(authorList, countList);
 }
 
+
+function makeNameAndCountArray (nameList, countList) {
+  const result = nameList.reduce((acc, desc, index) => {
+    acc.push({name: desc, count: countList[index]});
+    return acc;
+  }, []);
+  return result;
+}
+
+
+function orderByCount (nameCount) {
+  return nameCount.sort((placeA, placeB) => (placeB.count - placeA.count));
+}
+
+
+function topFive (list) {
+  while (list.length > 5) {
+    list.pop();
+  }
+  return list;
+}
+
+
+function makeSortedTopFiveNameCountArray (nameList, countList)
+{
+  const result = makeNameAndCountArray(nameList, countList);
+  orderByCount(result);
+  return topFive(result);
+}
+
+module.exports = {
+  getTotalBooksCount,
+  getTotalAccountsCount,
+  getBooksBorrowedCount,
+  getMostCommonGenres,
+  getMostPopularBooks,
+  getMostPopularAuthors,
+};
 module.exports = {
   getTotalBooksCount,
   getTotalAccountsCount,
